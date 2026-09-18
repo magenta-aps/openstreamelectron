@@ -52,14 +52,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          # Version-less copies, so /releases/latest/download/<name> keeps working
-          cp "dist/ScreenConnector-${VERSION}-x86_64.AppImage" dist/ScreenConnector-x86_64.AppImage
-          cp "dist/ScreenConnector-${VERSION}-arm64.AppImage" dist/ScreenConnector-arm64.AppImage
+          # Filenames carry no version, so /releases/latest/download/<name>
+          # resolves across releases; pin a build with the tag in the URL instead
           gh release create "$GITHUB_REF_NAME" \
             --title "$GITHUB_REF_NAME" \
             --generate-notes \
-            "dist/ScreenConnector-${VERSION}-x86_64.AppImage" \
-            "dist/ScreenConnector-${VERSION}-arm64.AppImage" \
             dist/ScreenConnector-x86_64.AppImage \
             dist/ScreenConnector-arm64.AppImage

@@ -20,8 +20,13 @@ curl -fLO https://github.com/magenta-aps/openstreamelectron/releases/latest/down
 No authentication is needed. Use `-L`, since GitHub redirects to its asset
 storage.
 
-Each release also carries versioned copies (`ScreenConnector-1.0.2-x86_64.AppImage`)
-if you need to pin a specific build; browse them under
+To pin a specific build, put the tag in the URL instead of `latest`:
+
+```
+https://github.com/magenta-aps/openstreamelectron/releases/download/1.0.2/ScreenConnector-x86_64.AppImage
+```
+
+All versions are listed under
 [releases](https://github.com/magenta-aps/openstreamelectron/releases).
 
 To publish a new version, push a tag:

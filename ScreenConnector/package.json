@@ -33,7 +33,7 @@
       ],
       "category": "Utility",
       "maintainer": "ln@magenta-aps.dk",
-      "artifactName": "ScreenConnector-${version}-${arch}.${ext}"
+      "artifactName": "ScreenConnector-${arch}.${ext}"
     }
   }
 }
