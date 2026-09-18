@@ -1,0 +1,19 @@
+# Ignore the Node.js modules directory
+node_modules/
+
+# Ignore the npm package lock file
+package-lock.json
+
+dist/
+
+.idea/
+
+
+*config.json
+
+
+
+
+
+
+

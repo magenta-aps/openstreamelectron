@@ -1,0 +1,65 @@
+name: Build AppImages
+
+on:
+  push:
+    branches: [main]
+    tags: ['*']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ScreenConnector
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: ScreenConnector/package-lock.json
+
+      # Electron ships ~120 MB of prebuilt binaries per architecture
+      - uses: actions/cache@v4
+        with:
+          path: ~/.cache/electron
+          key: electron-${{ hashFiles('ScreenConnector/package-lock.json') }}
+
+      - run: npm ci
+
+      - name: Build AppImages
+        run: |
+          # On a tag, the version comes from the tag rather than package.json
+          if [ "$GITHUB_REF_TYPE" = "tag" ]; then
+            EXTRA="-c.extraMetadata.version=${GITHUB_REF_NAME#v}"
+          fi
+          npx electron-builder --linux AppImage --x64 --arm64 --publish never $EXTRA
+          ls -lh dist/*.AppImage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: appimages
+          path: ScreenConnector/dist/*.AppImage
+
+      - name: Create release
+        if: github.ref_type == 'tag'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          # Version-less copies, so /releases/latest/download/<name> keeps working
+          cp "dist/ScreenConnector-${VERSION}-x86_64.AppImage" dist/ScreenConnector-x86_64.AppImage
+          cp "dist/ScreenConnector-${VERSION}-arm64.AppImage" dist/ScreenConnector-arm64.AppImage
+          gh release create "$GITHUB_REF_NAME" \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes \
+            "dist/ScreenConnector-${VERSION}-x86_64.AppImage" \
+            "dist/ScreenConnector-${VERSION}-arm64.AppImage" \
+            dist/ScreenConnector-x86_64.AppImage \
+            dist/ScreenConnector-arm64.AppImage
